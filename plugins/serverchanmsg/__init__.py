@@ -167,7 +167,9 @@ class ServerChanMsg(_PluginBase):
                 and msg_type.name not in self._msgtypes):
             logger.info(f"消息类型 {msg_type.value} 未开启消息发送")
             return
-
+        if not self._token:
+            logger.warn("未配置ServerChan的sendkey")
+            return
         try:
             sc_url = "https://sctapi.ftqq.com/" + self._token + ".send"
             event_info = {
@@ -179,10 +181,7 @@ class ServerChanMsg(_PluginBase):
                 ret_json = res.json()
                 code = ret_json.get('code')
                 msg = ret_json.get('msg')
-                if code == 200:
-                    logger.info("ServerChan消息发送成功")
-                else:
-                    logger.warn(f"ServerChan消息发送，接口返回失败，错误码：{code}，错误原因：{msg}")
+                logger.info(f"ServerChan消息发送完成 code：{code}， msg：{msg}")
             elif res is not None:
                 logger.warn(f"ServerChan消息发送失败，错误码：{res.status_code}，错误原因：{res.reason}")
             else:
